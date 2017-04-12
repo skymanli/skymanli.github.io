@@ -1,0 +1,790 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="编程," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="为使错误处理的代码不影响主程序的可读性，我们把与socket相关的一些系统函数加上错误处理代码包装成新的函数，做成一个模块。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络编程：封装错误处理函数">
+<meta property="og:url" content="http://yoursite.com/2017/04/12/2017-04-12-网络编程：错误处理函数/index.html">
+<meta property="og:site_name" content="skyman">
+<meta property="og:description" content="为使错误处理的代码不影响主程序的可读性，我们把与socket相关的一些系统函数加上错误处理代码包装成新的函数，做成一个模块。">
+<meta property="og:updated_time" content="2017-04-12T12:52:56.586Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="网络编程：封装错误处理函数">
+<meta name="twitter:description" content="为使错误处理的代码不影响主程序的可读性，我们把与socket相关的一些系统函数加上错误处理代码包装成新的函数，做成一个模块。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 网络编程：封装错误处理函数 | skyman </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">skyman</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-programming">
+          <a href="/categories/programming" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-desktop"></i> <br />
+            
+            编程
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-reading">
+          <a href="/categories/reading" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-book"></i> <br />
+            
+            读书
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                网络编程：封装错误处理函数
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-04-12T20:09:30+08:00" content="2017-04-12">
+              2017-04-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/编程/" itemprop="url" rel="index">
+                    <span itemprop="name">编程</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/编程/网络编程/" itemprop="url" rel="index">
+                    <span itemprop="name">网络编程</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>为使错误处理的代码不影响主程序的可读性，我们把与socket相关的一些系统函数加上错误处理代码包装成新的函数，做成一个模块。<br><a id="more"></a></p>
+<h4 id="1-wrap-h"><a href="#1-wrap-h" class="headerlink" title="1. wrap.h"></a>1. wrap.h</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/* wrap.h */</span></div><div class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> __WRAP_H_</span></div><div class="line"><span class="meta">#<span class="meta-keyword">define</span> __WRAP_H_</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">perr_exit</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *s)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">Accept</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">struct</span> sockaddr *sa, <span class="keyword">socklen_t</span> *salenptr)</span></span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Bind</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">struct</span> sockaddr *sa, <span class="keyword">socklen_t</span> salen)</span></span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Connect</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">struct</span> sockaddr *sa, <span class="keyword">socklen_t</span> salen)</span></span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Listen</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> backlog)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">Socket</span><span class="params">(<span class="keyword">int</span> family, <span class="keyword">int</span> type, <span class="keyword">int</span> protocol)</span></span>;</div><div class="line"><span class="keyword">ssize_t</span> Read(<span class="keyword">int</span> fd, <span class="keyword">void</span> *ptr, <span class="keyword">size_t</span> nbytes);</div><div class="line"><span class="keyword">ssize_t</span> Write(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *ptr, <span class="keyword">size_t</span> nbytes);</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Close</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</div><div class="line"><span class="keyword">ssize_t</span> Readn(<span class="keyword">int</span> fd, <span class="keyword">void</span> *vptr, <span class="keyword">size_t</span> n);</div><div class="line"><span class="keyword">ssize_t</span> Writen(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *vptr, <span class="keyword">size_t</span> n);</div><div class="line"><span class="function"><span class="keyword">static</span> ssize_t <span class="title">my_read</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">char</span> *ptr)</span></span>;</div><div class="line"><span class="keyword">ssize_t</span> Readline(<span class="keyword">int</span> fd, <span class="keyword">void</span> *vptr, <span class="keyword">size_t</span> maxlen);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div></pre></td></tr></table></figure>
+<h4 id="2-wrap-c"><a href="#2-wrap-c" class="headerlink" title="2. wrap.c"></a>2. wrap.c</h4><pre><code class="cpp"><span class="comment">/* wrap.c */</span>
+<span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span>
+<span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span>
+<span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span>
+
+<span class="function"><span class="keyword">void</span> <span class="title">perr_exit</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *s)</span>
+</span>{
+    perror(s);
+    <span class="built_in">exit</span>(<span class="number">1</span>);
+}
+
+<span class="function"><span class="keyword">int</span> <span class="title">Accept</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">struct</span> sockaddr *sa, <span class="keyword">socklen_t</span> *salenptr)</span>
+</span>{
+    <span class="keyword">int</span> n;
+    again:
+    <span class="keyword">if</span> ( (n = accept(fd, sa, salenptr)) &lt; <span class="number">0</span>) {
+        <span class="keyword">if</span> ((errno == ECONNABORTED) || (errno == EINTR))
+            <span class="keyword">goto</span> again;
+        <span class="keyword">else</span>
+            perr_exit(<span class="string">"accept error"</span>);
+    }
+    <span class="keyword">return</span> n;
+}
+
+<span class="function"><span class="keyword">void</span> <span class="title">Bind</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">struct</span> sockaddr *sa, <span class="keyword">socklen_t</span> salen)</span>
+</span>{
+    <span class="keyword">if</span> (bind(fd, sa, salen) &lt; <span class="number">0</span>)
+        perr_exit(<span class="string">"bind error"</span>);
+}
+
+<span class="function"><span class="keyword">void</span> <span class="title">Connect</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">struct</span> sockaddr *sa, <span class="keyword">socklen_t</span> salen)</span>
+</span>{
+    <span class="keyword">if</span> (connect(fd, sa, salen) &lt; <span class="number">0</span>)
+        perr_exit(<span class="string">"connect error"</span>);
+}
+
+<span class="function"><span class="keyword">void</span> <span class="title">Listen</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> backlog)</span>
+</span>{
+    <span class="keyword">if</span> (listen(fd, backlog) &lt; <span class="number">0</span>)
+        perr_exit(<span class="string">"listen error"</span>);
+}
+
+<span class="function"><span class="keyword">int</span> <span class="title">Socket</span><span class="params">(<span class="keyword">int</span> family, <span class="keyword">int</span> type, <span class="keyword">int</span> protocol)</span>
+</span>{
+    <span class="keyword">int</span> n;
+    <span class="keyword">if</span> ( (n = socket(family, type, protocol)) &lt; <span class="number">0</span>)
+        perr_exit(<span class="string">"socket error"</span>);
+    <span class="keyword">return</span> n;
+}
+
+<span class="keyword">ssize_t</span> Read(<span class="keyword">int</span> fd, <span class="keyword">void</span> *ptr, <span class="keyword">size_t</span> nbytes)
+{
+    <span class="keyword">ssize_t</span> n;
+    again:
+    <span class="keyword">if</span> ( (n = read(fd, ptr, nbytes)) == <span class="number">-1</span>) {
+        <span class="keyword">if</span> (errno == EINTR)
+            <span class="keyword">goto</span> again;
+        <span class="keyword">else</span>
+            <span class="keyword">return</span> <span class="number">-1</span>;
+    }
+    <span class="keyword">return</span> n;
+}
+
+<span class="keyword">ssize_t</span> Write(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *ptr, <span class="keyword">size_t</span> nbytes)
+{
+    <span class="keyword">ssize_t</span> n;
+    again:
+    <span class="keyword">if</span> ( (n = write(fd, ptr, nbytes)) == <span class="number">-1</span>) {
+        <span class="keyword">if</span> (errno == EINTR)
+            <span class="keyword">goto</span> again;
+        <span class="keyword">else</span>
+            <span class="keyword">return</span> <span class="number">-1</span>;
+    }
+    <span class="keyword">return</span> n;
+}
+
+<span class="function"><span class="keyword">void</span> <span class="title">Close</span><span class="params">(<span class="keyword">int</span> fd)</span>
+</span>{
+    <span class="keyword">if</span> (close(fd) == <span class="number">-1</span>)
+        perr_exit(<span class="string">"close error"</span>);
+}
+<span class="comment">//参数3：n 为应读取的字节数</span>
+<span class="keyword">ssize_t</span> Readn(<span class="keyword">int</span> fd, <span class="keyword">void</span> *vptr, <span class="keyword">size_t</span> n)
+{
+    <span class="keyword">size_t</span> nleft;        <span class="comment">//剩余未读取的字节数</span>
+    <span class="keyword">ssize_t</span> nread;        <span class="comment">//实际读到的字节数</span>
+    <span class="keyword">char</span> *ptr;
+    ptr = vptr;
+    nleft = n;
+    <span class="keyword">while</span> (nleft &gt; <span class="number">0</span>) {
+        <span class="keyword">if</span> ( (nread = read(fd, ptr, nleft)) &lt; <span class="number">0</span>) {
+            <span class="keyword">if</span> (errno == EINTR)
+                nread = <span class="number">0</span>;
+            <span class="keyword">else</span>
+                <span class="keyword">return</span> <span class="number">-1</span>;
+        } <span class="keyword">else</span> <span class="keyword">if</span> (nread == <span class="number">0</span>)
+            <span class="keyword">break</span>;
+        nleft -= nread;
+        ptr += nread;
+    }
+    <span class="keyword">return</span> n - nleft;
+}
+
+<span class="keyword">ssize_t</span> Writen(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *vptr, <span class="keyword">size_t</span> n)
+{
+    <span class="keyword">size_t</span> nleft;
+    <span class="keyword">ssize_t</span> nwritten;
+    <span class="keyword">const</span> <span class="keyword">char</span> *ptr;
+    ptr = vptr;
+    nleft = n;
+    <span class="keyword">while</span> (nleft &gt; <span class="number">0</span>) {
+        <span class="keyword">if</span> ( (nwritten = write(fd, ptr, nleft)) &lt;= <span class="number">0</span>) {
+            <span class="keyword">if</span> (nwritten &lt; <span class="number">0</span> &amp;&amp; errno == EINTR)
+
+                nwritten = <span class="number">0</span>;
+            <span class="keyword">else</span>
+                <span class="keyword">return</span> <span class="number">-1</span>;
+        }
+        nleft -= nwritten;
+        ptr += nwritten;
+    }
+    <span class="keyword">return</span> n;
+}
+
+<span class="function"><span class="keyword">static</span> ssize_t <span class="title">my_read</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">char</span> *ptr)</span>
+</span>{
+    <span class="keyword">static</span> <span class="keyword">int</span> read_cnt;
+    <span class="keyword">static</span> <span class="keyword">char</span> *read_ptr;
+    <span class="keyword">static</span> <span class="keyword">char</span> read_buf[<span class="number">100</span>];
+    <span class="keyword">if</span> (read_cnt &lt;= <span class="number">0</span>) {
+        again:
+        <span class="keyword">if</span> ( (read_cnt = read(fd, read_buf, <span class="keyword">sizeof</span>(read_buf))) &lt; <span class="number">0</span>) {
+            <span class="keyword">if</span> (errno == EINTR)
+                <span class="keyword">goto</span> again;
+            <span class="keyword">return</span> <span class="number">-1</span>;
+        } <span class="keyword">else</span> <span class="keyword">if</span> (read_cnt == <span class="number">0</span>)
+        <span class="keyword">return</span> <span class="number">0</span>;
+        read_ptr = read_buf;
+    }
+    read_cnt--;
+    *ptr = *read_ptr++;
+    <span class="keyword">return</span> <span class="number">1</span>;
+}
+
+<span class="keyword">ssize_t</span> Readline(<span class="keyword">int</span> fd, <span class="keyword">void</span> *vptr, <span class="keyword">size_t</span> maxlen)
+{
+    <span class="keyword">ssize_t</span> n, rc;
+    <span class="keyword">char</span> c, *ptr;
+    ptr = vptr;
+    <span class="keyword">for</span> (n = <span class="number">1</span>; n &lt; maxlen; n++) {
+        <span class="keyword">if</span> ( (rc = my_read(fd, &amp;c)) == <span class="number">1</span>) {
+            *ptr++ = c;
+            <span class="keyword">if</span> (c == <span class="string">'\n'</span>)
+                <span class="keyword">break</span>;
+        } <span class="keyword">else</span> <span class="keyword">if</span> (rc == <span class="number">0</span>) {
+            *ptr = <span class="number">0</span>;
+            <span class="keyword">return</span> n - <span class="number">1</span>;
+        } <span class="keyword">else</span>
+        <span class="keyword">return</span> <span class="number">-1</span>;
+    }
+    *ptr = <span class="number">0</span>;
+    <span class="keyword">return</span> n;
+}
+</code></pre>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程/" rel="tag">#编程</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/29/Oracle数据库学习/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpeg"
+               alt="skyman" />
+          <p class="site-author-name" itemprop="name">skyman</p>
+          <p class="site-description motion-element" itemprop="description">记录一点点</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-wrap-h"><span class="nav-text">1. wrap.h</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-wrap-c"><span class="nav-text">2. wrap.c</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">skyman</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
